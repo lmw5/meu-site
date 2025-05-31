@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gerador de Sinais - Mines</title>
+  <title>Gerador de Sinais - Jogo Mines</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
-      height: 100%;
       width: 100%;
       background-color: #0077FF;
       font-family: Arial, sans-serif;
@@ -18,23 +17,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 100%;
       padding: 20px 10px;
+      gap: 20px;
       box-sizing: border-box;
-      gap: 20px;
-    }
-
-    .main-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      width: 100%;
     }
 
     .info-panel {
       display: flex;
-      flex-direction: row;
       justify-content: space-between;
       gap: 12px;
       background: linear-gradient(135deg, #0d6efd, #0a58ca);
@@ -44,7 +33,6 @@
       width: 100%;
       max-width: 400px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      text-align: center;
       font-weight: 500;
       font-size: 16px;
     }
@@ -56,16 +44,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      font-size: 15px;
-      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.15);
       flex: 1;
-    }
-
-    .button-container-inline {
-      display: flex;
-      justify-content: center;
-      width: 100%;
     }
 
     .generate-button {
@@ -84,10 +63,6 @@
     .generate-button:disabled {
       background-color: #6c757d;
       cursor: not-allowed;
-    }
-
-    .generate-button:hover:not(:disabled) {
-      background-color: #218838;
     }
 
     .grid-container {
@@ -133,30 +108,56 @@
       font-size: 22px;
       font-weight: bold;
     }
+
+    .iframe-container {
+      width: 100%;
+      max-width: 100%;
+      margin-top: 20px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100vh;
+      min-height: 600px;
+      border: none;
+      border-radius: 12px;
+      display: block;
+    }
   </style>
 </head>
 <body>
   <div class="layout">
-    <div class="main-container">
-      <div class="info-panel" id="infoPanel">
-        <div class="info-section">
-          Nº de minas 
-          <span id="minas">:03</span>
-        </div>
-        <div class="info-section">
-          Validade até
-          <span id="timer">00:25</span>
-        </div>
-      </div>
 
-      <div class="button-container-inline">
-        <button class="generate-button" id="generateButton">Encontrar Sinal</button>
+    <!-- Painel -->
+    <div class="info-panel" id="infoPanel">
+      <div class="info-section">
+        Nº de minas 
+        <span id="minas">:03</span>
+      </div>
+      <div class="info-section">
+        Validade até
+        <span id="timer">00:25</span>
       </div>
     </div>
 
+    <!-- Botão -->
+    <button class="generate-button" id="generateButton">Encontrar Sinal</button>
+
+    <!-- Grid -->
     <div class="grid-container">
       <div class="grid" id="grid"></div>
     </div>
+
+    <!-- Iframe -->
+    <div class="iframe-container">
+      <iframe 
+        id="iframeSite"
+        src="https://meu-site-rqrp.onrender.com"
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation"
+        allowfullscreen>
+      </iframe>
+    </div>
+
   </div>
 
   <script>
@@ -164,7 +165,6 @@
     let timerInterval;
     const timerElement = document.getElementById('timer');
     const grid = document.getElementById('grid');
-    const infoPanel = document.getElementById('infoPanel');
     const generateButton = document.getElementById('generateButton');
     let starPositions = [];
 
@@ -190,7 +190,7 @@
         if (starPositions.includes(index)) {
           const star = document.createElement('div');
           star.classList.add('star');
-          star.textContent = '💎'; // Agora mostra diamantes
+          star.textContent = '💎';
           cell.appendChild(star);
         }
         grid.appendChild(cell);
@@ -198,10 +198,10 @@
     }
 
     function startTimer() {
+      clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         countdown--;
         timerElement.innerText = `00:${countdown < 10 ? '0' : ''}${countdown}`;
-
         if (countdown === 0) {
           clearInterval(timerInterval);
           generateButton.disabled = false;
@@ -213,7 +213,6 @@
       countdown = 25;
       timerElement.innerText = '00:25';
       generateButton.disabled = true;
-      infoPanel.style.display = 'flex';
       createGrid();
       startTimer();
     });
