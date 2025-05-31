@@ -2,24 +2,20 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gerador de Sinais - Jogo Mines</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html {
-      margin: 0;
-      padding: 0;
+      height: 100%;
       width: 100%;
       background-color: #0077FF;
       font-family: Arial, sans-serif;
-    }
-
-    .layout {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 10px;
       gap: 20px;
-      box-sizing: border-box;
+      padding: 20px 10px;
     }
 
     .info-panel {
@@ -27,7 +23,7 @@
       justify-content: space-between;
       gap: 12px;
       background: linear-gradient(135deg, #0d6efd, #0a58ca);
-      color: #ffffff;
+      color: white;
       padding: 16px;
       border-radius: 12px;
       width: 100%;
@@ -38,17 +34,15 @@
     }
 
     .info-section {
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 10px 12px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       flex: 1;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
     }
 
     .generate-button {
-      background-color: #28a745;
+      background: #28a745;
       color: white;
       border: none;
       padding: 14px 24px;
@@ -60,35 +54,29 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .generate-button:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
-    }
+    .generate-button:disabled { background: #6c757d; cursor: not-allowed; }
+    .generate-button:hover:not(:disabled) { background: #218838; }
 
     .grid-container {
       width: 100%;
       max-width: 420px;
       aspect-ratio: 1 / 1;
-      background-color: #ffffff;
+      background: white;
       border-radius: 16px;
       padding: 12px;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(5, 1fr);
       gap: 6px;
       width: 100%;
       height: 100%;
     }
 
     .cell {
-      background-color: #1c1c1c;
+      background: #1c1c1c;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -97,67 +85,46 @@
     }
 
     .star {
-      background-color: #f39c12;
+      background: #f39c12;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+      border-radius: 5px;
       width: 100%;
       height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 5px;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
     }
 
     .iframe-container {
       width: 100%;
       max-width: 100%;
-      margin-top: 20px;
     }
 
     iframe {
       width: 100%;
-      height: 100vh;
-      min-height: 600px;
+      height: 600px;
       border: none;
       border-radius: 12px;
-      display: block;
     }
   </style>
 </head>
 <body>
-  <div class="layout">
 
-    <!-- Painel -->
-    <div class="info-panel" id="infoPanel">
-      <div class="info-section">
-        Nº de minas 
-        <span id="minas">:03</span>
-      </div>
-      <div class="info-section">
-        Validade até
-        <span id="timer">00:25</span>
-      </div>
-    </div>
+  <div class="info-panel">
+    <div class="info-section">Nº de minas<br><span id="minas">:03</span></div>
+    <div class="info-section">Validade até<br><span id="timer">00:25</span></div>
+  </div>
 
-    <!-- Botão -->
-    <button class="generate-button" id="generateButton">Encontrar Sinal</button>
+  <button class="generate-button" id="generateButton">Encontrar Sinal</button>
 
-    <!-- Grid -->
-    <div class="grid-container">
-      <div class="grid" id="grid"></div>
-    </div>
+  <div class="grid-container">
+    <div class="grid" id="grid"></div>
+  </div>
 
-    <!-- Iframe -->
-    <div class="iframe-container">
-      <iframe 
-        id="iframeSite"
-        src="https://meu-site-rqrp.onrender.com"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation"
-        allowfullscreen>
-      </iframe>
-    </div>
-
+  <div class="iframe-container">
+    <iframe src="https://meu-site-rqrp.onrender.com" id="iframeSite" allowfullscreen></iframe>
   </div>
 
   <script>
@@ -171,7 +138,6 @@
     function createGrid() {
       grid.innerHTML = '';
       const cells = [];
-
       for (let i = 0; i < 25; i++) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
@@ -180,14 +146,12 @@
 
       starPositions = [];
       while (starPositions.length < 3) {
-        let randomPosition = Math.floor(Math.random() * 25);
-        if (!starPositions.includes(randomPosition)) {
-          starPositions.push(randomPosition);
-        }
+        const pos = Math.floor(Math.random() * 25);
+        if (!starPositions.includes(pos)) starPositions.push(pos);
       }
 
-      cells.forEach((cell, index) => {
-        if (starPositions.includes(index)) {
+      cells.forEach((cell, i) => {
+        if (starPositions.includes(i)) {
           const star = document.createElement('div');
           star.classList.add('star');
           star.textContent = '💎';
@@ -202,14 +166,14 @@
       timerInterval = setInterval(() => {
         countdown--;
         timerElement.innerText = `00:${countdown < 10 ? '0' : ''}${countdown}`;
-        if (countdown === 0) {
+        if (countdown <= 0) {
           clearInterval(timerInterval);
           generateButton.disabled = false;
         }
       }, 1000);
     }
 
-    generateButton.addEventListener('click', function () {
+    generateButton.addEventListener('click', () => {
       countdown = 25;
       timerElement.innerText = '00:25';
       generateButton.disabled = true;
@@ -217,5 +181,6 @@
       startTimer();
     });
   </script>
+
 </body>
 </html>
