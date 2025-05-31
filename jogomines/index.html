@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Sinais - Mines</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #0077FF;
+      font-family: Arial, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding: 20px 10px;
+      box-sizing: border-box;
+      gap: 20px;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .info-panel {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 12px;
+      background: linear-gradient(135deg, #0d6efd, #0a58ca);
+      color: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    .info-section {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.15);
+      flex: 1;
+    }
+
+    .button-container-inline {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .generate-button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      font-size: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .generate-button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    .generate-button:hover:not(:disabled) {
+      background-color: #218838;
+    }
+
+    .grid-container {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      background-color: #ffffff;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 6px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cell {
+      background-color: #1c1c1c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .star {
+      background-color: #f39c12;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 5px;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="main-container">
+      <div class="info-panel" id="infoPanel">
+        <div class="info-section">
+          Nº de minas 
+          <span id="minas">:03</span>
+        </div>
+        <div class="info-section">
+          Validade até
+          <span id="timer">00:25</span>
+        </div>
+      </div>
+
+      <div class="button-container-inline">
+        <button class="generate-button" id="generateButton">Encontrar Sinal</button>
+      </div>
+    </div>
+
+    <div class="grid-container">
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <script>
+    let countdown = 25;
+    let timerInterval;
+    const timerElement = document.getElementById('timer');
+    const grid = document.getElementById('grid');
+    const infoPanel = document.getElementById('infoPanel');
+    const generateButton = document.getElementById('generateButton');
+    let starPositions = [];
+
+    function createGrid() {
+      grid.innerHTML = '';
+      const cells = [];
+
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cells.push(cell);
+      }
+
+      starPositions = [];
+      while (starPositions.length < 3) {
+        let randomPosition = Math.floor(Math.random() * 25);
+        if (!starPositions.includes(randomPosition)) {
+          starPositions.push(randomPosition);
+        }
+      }
+
+      cells.forEach((cell, index) => {
+        if (starPositions.includes(index)) {
+          const star = document.createElement('div');
+          star.classList.add('star');
+          star.textContent = '💎'; // Agora mostra diamantes
+          cell.appendChild(star);
+        }
+        grid.appendChild(cell);
+      });
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        countdown--;
+        timerElement.innerText = `00:${countdown < 10 ? '0' : ''}${countdown}`;
+
+        if (countdown === 0) {
+          clearInterval(timerInterval);
+          generateButton.disabled = false;
+        }
+      }, 1000);
+    }
+
+    generateButton.addEventListener('click', function () {
+      countdown = 25;
+      timerElement.innerText = '00:25';
+      generateButton.disabled = true;
+      infoPanel.style.display = 'flex';
+      createGrid();
+      startTimer();
+    });
+  </script>
+</body>
+</html>
